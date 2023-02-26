@@ -19,14 +19,16 @@
                                                :isNotNull {:type 'Boolean}
                                                :between   {:type between-op}}}}]
     (case (name lacinia-type)
-      "String"  (-> (dissoc all-ops between-op)
-                    (update-in [comparison-op :fields] #(dissoc % :between :lt :lte :gt :gte))
-                    (update-in [comparison-op :fields] #(assoc %
-                                                               :like {:type 'String} :notLike {:type 'String})))
+      "String" (-> (dissoc all-ops between-op)
+                   (update-in [comparison-op :fields] #(dissoc % :between :lt :lte :gt :gte))
+                   (update-in [comparison-op :fields] #(assoc %
+                                                              :like {:type 'String} :notLike {:type 'String})))
       "Boolean" (update-in (dissoc all-ops between-op)
                            [comparison-op :fields] #(dissoc % :between :lt :lte :gt :gte :in :notIn))
       "UUID" (update-in (dissoc all-ops between-op)
                         [comparison-op :fields] #(dissoc % :between :lt :lte :gt :gte))
+      "JSON" {comparison-op {:fields {:isNull {:type 'Boolean}
+                                      :isNotNull {:type 'Boolean}}}}
       all-ops)))
 
 (def ^:private comparison-input-objects
@@ -43,7 +45,8 @@
    (comparison-input-object 'Time)
    (comparison-input-object 'TimeWithTimeZone)
    (comparison-input-object 'DateTime)
-   (comparison-input-object 'DateTimeWithTimeZone)))
+   (comparison-input-object 'DateTimeWithTimeZone)
+   (comparison-input-object 'JSON)))
 
 (defn- order-by-field [attr-md]
   {(:attr.ident/camel-case attr-md) {:type :OrderBy}})

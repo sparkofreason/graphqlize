@@ -1,4 +1,5 @@
 (ns graphqlize.lacinia.scalar
+  (:require [clojure.data.json :as json])
   (:import [java.util UUID]
            [java.time LocalDate LocalTime OffsetTime LocalDateTime OffsetDateTime]))
 
@@ -15,10 +16,10 @@
                                 nil))}})
 
 (defn generate []
-  (merge (scalar :UUID string? 
+  (merge (scalar :UUID string?
                  #(UUID/fromString %) str "UUID")
-         (scalar :Date string? 
-                 #(LocalDate/parse %) str 
+         (scalar :Date string?
+                 #(LocalDate/parse %) str
                  "A date without a time-zone in the ISO-8601 calendar system, such as 2007-12-03 (java.time.LocalDate).")
          (scalar :Time string?
                  #(LocalTime/parse %) str
@@ -26,18 +27,21 @@
          (scalar :TimeWithTimeZone string?
                  #(OffsetTime/parse %) str
                  "A time with an offset from UTC/Greenwich in the ISO-8601 calendar system, such as 10:15:30+01:00 (java.time.OffsetTime).")
-         (scalar :DateTime string? 
-                 #(LocalDateTime/parse %) str 
+         (scalar :DateTime string?
+                 #(LocalDateTime/parse %) str
                  "A date-time without a time-zone in the ISO-8601 calendar system, such as 2007-12-03T10:15:30 (java.time.LocalDateTime).")
-         (scalar :DateTimeWithTimeZone string? 
-                 #(OffsetDateTime/parse %) str 
+         (scalar :DateTimeWithTimeZone string?
+                 #(OffsetDateTime/parse %) str
                  "A date-time with an offset from UTC/Greenwich in the ISO-8601 calendar system, such as 2007-12-03T10:15:30+01:00 (java.time.OffsetDateTime).")
-         (scalar :BigDecimal number? 
-                 bigdec identity 
+         (scalar :BigDecimal number?
+                 bigdec identity
                  "An arbitrary-precision signed decimal number (java.math.BigDecimal)")
-         (scalar :Long number? 
-                 long identity 
+         (scalar :Long number?
+                 long identity
                  "The long data type is a 64-bit two's complement integer (java.lang.Long).")
-         (scalar :BigInteger number? 
-                 biginteger identity 
-                 "An arbitrary-precision integer (java.math.BigInteger)")))
+         (scalar :BigInteger number?
+                 biginteger identity
+                 "An arbitrary-precision integer (java.math.BigInteger)")
+         (scalar :JSON #(or (map? %) (vector %))
+                 identity identity
+                 "JSON")))

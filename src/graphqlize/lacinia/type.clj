@@ -1,6 +1,6 @@
 (ns graphqlize.lacinia.type)
 
-(defn lacinia-type 
+(defn lacinia-type
   ([heql-attr-type]
    (lacinia-type heql-attr-type nil))
   ([heql-attr-type entity-ident-in-pascal-case]
@@ -19,7 +19,8 @@
      :attr.type/date 'Date
      :attr.type/time 'Time
      :attr.type/time-with-time-zone 'TimeWithTimeZone
+     :attr.type/json 'JSON
      (:attr.type/time-span
-      :attr.type/offset-time :attr.type/ip-address :attr.type/json 
+      :attr.type/offset-time :attr.type/ip-address
       :attr.type/unknown) 'String
      nil)))
