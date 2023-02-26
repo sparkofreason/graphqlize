@@ -14,14 +14,16 @@
                           :attr.type/time :attr.type/time-with-time-zone) ["countOf" "minOf" "maxOf"]
     ["countOf"]))
 
-(defn- aggregate-fields [{:attr/keys [type]
-                          :as attr-md}]
+(defn- aggregate-fields
+  [{:attr/keys [type] :as attr-md} rel-keys]
   (when-not (= :attr.type/ref type)
     (let [field-name (-> (:attr.ident/camel-case attr-md)
                          inf/camel-case
                          name)
           field-type (l-type/lacinia-type type)
-          prefixes (aggregate-field-prefixes type)
+          prefixes (if (rel-keys (:attr/ident attr-md))
+                     ["countOf"]
+                     (aggregate-field-prefixes type))
           int-type (list 'non-null 'Int)
           float-type 'Float
           decimal-type 'BigDecimal
@@ -30,7 +32,7 @@
                 (assoc m (keyword (str p field-name))
                        (case p
                          "countOf" {:type int-type}
-                         "avgOf" (if (:= :attr.type/decimal type) 
+                         "avgOf" (if (:= :attr.type/decimal type)
                                    {:type decimal-type}
                                    {:type float-type})
                          {:type field-type }))) {} prefixes))))
@@ -54,8 +56,15 @@
         field-name                   (:attr.ident/camel-case attr-meta-data)
         field-def                    {:type gql-field-type}
         field-def                    (if has-many?
-                                       (assoc field-def :args (l-arg/many-field-args heql-meta-data ref-entity-md))
-                                       field-def)]
+                                       (assoc field-def :args (l-arg/many-field-args ref-entity-md))
+                                       (if ref-entity-md
+                                         (assoc field-def :args (l-arg/where-predicate-arg ref-entity-md))
+                                         field-def))
+        entity-md (heql-md/entity-meta-data heql-meta-data (:attr.entity/ident attr-meta-data))
+        rel-keys (->> entity-md
+                      :entity.relation/foreign-keys
+                      (map :entity.relation.foreign-key/self-attr)
+                      (into (get-in entity-md [:entity.relation/primary-key :entity.relation.primary-key/attrs] {})))]
     (when field-type
       (merge {field-name field-def}
-             (aggregate-fields attr-meta-data)))))
+             (aggregate-fields attr-meta-data rel-keys)))))

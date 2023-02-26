@@ -1,3 +1,4 @@
 {:paths ["src"]
- :deps  {honeyeql                {:local/root "./../honeyeql"}
-         com.walmartlabs/lacinia {:mvn/version "0.36.0"}}}
+ :deps  {org.graphqlize/honeyeql {:mvn/version "0.1.0-alpha46"}
+         com.walmartlabs/lacinia {:mvn/version "1.2"}}
+ :aliases {:dev {:extra-paths ["dev"]}}}

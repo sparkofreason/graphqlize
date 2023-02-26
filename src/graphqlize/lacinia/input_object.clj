@@ -89,6 +89,7 @@
 
 (defn generate [heql-meta-data]
   (->> (heql-md/entities heql-meta-data)
+       (remove #(empty? (heql-md/attr-idents %)))
        (map #(entity-meta-data->input-object heql-meta-data %))
        (cons comparison-input-objects)
        (apply merge)))

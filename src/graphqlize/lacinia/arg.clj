@@ -35,20 +35,17 @@
                               (str "GroupByEnum")
                               keyword)))}})
 
-(defn- where-predicate-arg [e-md]
+(defn where-predicate-arg [e-md]
   {:where {:type (-> (:entity.ident/pascal-case e-md)
                      name
                      (str "Predicate")
                      keyword)}})
 
-(defn many-field-args [heql-meta-data entity-meta-data]
-  (let [default-args (merge pagination-args
-                            (where-predicate-arg entity-meta-data)
-                            (group-by-arg entity-meta-data))]
-    (if (not= "MySQL" (heql-md/db-product-name heql-meta-data))
-      (merge default-args
-             (order-by-arg entity-meta-data))
-      default-args)))
+(defn many-field-args [entity-meta-data]
+  (merge pagination-args
+         (where-predicate-arg entity-meta-data)
+         (group-by-arg entity-meta-data)
+         (order-by-arg entity-meta-data)))
 
 (defn query-args [heql-meta-data entity-meta-data query-type]
   (cond-> {}

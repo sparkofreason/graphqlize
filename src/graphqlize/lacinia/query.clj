@@ -30,4 +30,4 @@
                       (merge
                        (entity-meta-data->query-by-primary-key heql-meta-data e-md)
                        (entity-meta-data->collection-query heql-meta-data e-md)))
-                    (heql-md/entities heql-meta-data))))
+                    (remove #(empty? (heql-md/attr-idents %)) (heql-md/entities heql-meta-data)))))
