@@ -1,6 +1,7 @@
 (ns graphqlize.lacinia.eql
   (:require [inflections.core :as inf]
             [clojure.string :as string]
+            #_[camel-snake-kebab.core :as csk]
             [honeyeql.debug :refer [trace>>]]))
 
 
@@ -84,7 +85,7 @@
         [op v] (first pred)]
     (if-let [pred-fn (hql-predicate-fn op)]
       (pred-fn column v)
-      (let [col    [column (-> (ffirst pred) name keyword)]
+      (let [col    [column (-> (ffirst pred) name keyword inf/hyphenate)]
             [op v] (first v)]
         ((hql-predicate-fn op) col v)))))
 
@@ -110,8 +111,8 @@
 #_(where-clause "author" [{:have :courses}])
 
 (defn- eqlify-where-predicate [namespaces selection-tree param]
-  (-> (eql-root-attr-ns namespaces selection-tree) 
-      (where-clause [param]) 
+  (-> (eql-root-attr-ns namespaces selection-tree)
+      (where-clause [param])
       first))
 
 #_(eqlify-where-predicate
@@ -155,7 +156,7 @@
     (if-let [agg-prop (some (fn [prefix]
                      (when (string/starts-with? k (str prefix "-"))
                        [(keyword (string/replace-first prefix #"-of$" ""))
-                        (keyword n (string/replace-first k (re-pattern (str "^" prefix "-")) ""))])) 
+                        (keyword n (string/replace-first k (re-pattern (str "^" prefix "-")) ""))]))
                    ["count-of" "avg-of" "sum-of" "min-of" "max-of"])]
       agg-prop
       prop)))
