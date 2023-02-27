@@ -23,6 +23,7 @@
                        (l-eql/generate sel-tree args))]
       (trace>> :lacinia-resolver {:selections-tree sel-tree
                                   :args            args})
+      (trace>> :heql eql)
       (try
         (->> (heql-query-fn db-adapter eql)
              (trace>> :resolved-value)
