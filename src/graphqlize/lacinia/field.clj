@@ -2,6 +2,7 @@
   (:require [honeyeql.meta-data :as heql-md]
             [graphqlize.lacinia.arg :as l-arg]
             [graphqlize.lacinia.type :as l-type]
+            [honeyeql.debug :refer [trace>>]]
             [inflections.core :as inf]))
 
 #_ (inf/camel-case :firstName)
@@ -63,8 +64,8 @@
         entity-md (heql-md/entity-meta-data heql-meta-data (:attr.entity/ident attr-meta-data))
         rel-keys (->> entity-md
                       :entity.relation/foreign-keys
-                      (map :entity.relation.foreign-key/self-attr)
-                      (into (get-in entity-md [:entity.relation/primary-key :entity.relation.primary-key/attrs] {})))]
+                      (mapv :entity.relation.foreign-key/self-attr)
+                      (into (get-in entity-md [:entity.relation/primary-key :entity.relation.primary-key/attrs] #{})))]
     (when field-type
       (merge {field-name field-def}
              (aggregate-fields attr-meta-data rel-keys)))))
