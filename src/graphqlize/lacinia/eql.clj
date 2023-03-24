@@ -168,13 +168,16 @@
         prop         (->> (name field)
                           inf/hyphenate
                           (keyword root-attr-ns))]
-    (if-let [{:keys [selections args]} (first (selection-tree field))]
-      (let [parameters (parameters namespaces selections args)
-            prop       (if (empty? parameters)
-                         prop
-                         (list prop parameters))]
-        {prop (properties namespaces selections)})
-      (resolve-aggregate-column prop))))
+    (let [{:keys [selections args]} (first (selection-tree field))]
+      (if (or selections args)
+        (do
+          (println "--->" (first (selection-tree field)))
+          (let [parameters (parameters namespaces selections args)
+                prop       (if (empty? parameters)
+                             prop
+                             (list prop parameters))]
+            {prop (properties namespaces selections)}))
+        (resolve-aggregate-column prop)))))
 
 #_(field->prop [:public] {:Course/countOfRating [nil]
                           :Course/maxOfRating   [nil]
